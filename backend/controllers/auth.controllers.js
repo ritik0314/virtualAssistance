@@ -5,7 +5,12 @@ export const signUp=async (req,res)=>{
 try {
     const {name,email,password}=req.body
 
-    const existEmail=await User.findOne({email})
+    if(!name?.trim() || !email?.trim() || !password){
+        return res.status(400).json({message:"name, email, and password are required"})
+    }
+
+    const normalizedEmail=email.trim().toLowerCase()
+    const existEmail=await User.findOne({email:normalizedEmail})
     if(existEmail){
         return res.status(400).json({message:"email already exists !"})
     }
@@ -16,7 +21,7 @@ try {
     const hashedPassword=await bcrypt.hash(password,10)
 
     const user=await User.create({
-        name,password:hashedPassword,email
+        name:name.trim(),password:hashedPassword,email:normalizedEmail
     })
 
     const token=await genToken(user._id)

@@ -1,7 +1,12 @@
 import axios from "axios"
 const geminiResponse=async (command,assistantName,userName)=>{
 try {
-    const apiUrl=process.env.GEMINI_API_URL
+    const apiKey=process.env.GEMINI_API_KEY
+    const model=process.env.GEMINI_MODEL || "gemini-2.5-flash"
+    if (!apiKey || apiKey === "REPLACE_WITH_YOUR_NEW_GEMINI_API_KEY") {
+        throw new Error("GEMINI_API_KEY is not configured")
+    }
+    const apiUrl=`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`
     const prompt = `You are a virtual assistant named ${assistantName} created by ${userName}. 
 You are not Google. You will now behave like a voice-enabled assistant.
 
@@ -51,9 +56,14 @@ now your userInput- ${command}
     "parts":[{"text": prompt}]
     }]
     })
-return result.data.candidates[0].content.parts[0].text
+    const responseText=result.data?.candidates?.[0]?.content?.parts?.[0]?.text
+    if (!responseText) {
+        throw new Error("Gemini returned an empty response")
+    }
+    return responseText
 } catch (error) {
-    console.log(error)
+    console.error("Gemini request failed:", error.response?.data || error.message)
+    throw error
 }
 }
 
