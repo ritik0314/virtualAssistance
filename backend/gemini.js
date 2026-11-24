@@ -2,7 +2,7 @@ import axios from "axios"
 const geminiResponse=async (command,assistantName,userName)=>{
 try {
     const apiKey=process.env.GEMINI_API_KEY
-    const model=process.env.GEMINI_MODEL || "gemini-3.8-flash"
+    const model=process.env.GEMINI_MODEL || "gemini-4-hydrogen"
     if (!apiKey || apiKey === "REPLACE_WITH_YOUR_NEW_GEMINI_API_KEY") {
         throw new Error("GEMINI_API_KEY is not configured")
     }
